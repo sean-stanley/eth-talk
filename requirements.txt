@@ -1,0 +1,8 @@
+cdp-langchain==0.0.6
+cdp-agentkit-core==0.0.4
+langchain-core==0.3.18
+langchain-openai==0.2.8
+langgraph==0.2.48
+pydantic==2.9.2
+cdp-sdk==0.10.3
+Flask==3.0.3
