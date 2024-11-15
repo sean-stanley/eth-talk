@@ -8,6 +8,13 @@ authors = [
 dependencies = [
     "flask>=3.1.0",
     "cdp-sdk>=0.10.3",
+    "pydantic>=2.9.2",
+    "langgraph>=0.2.48",
+    "langchain-openai>=0.2.8",
+    "langchain-core>=0.3.19",
+    "cdp-agentkit-core>=0.0.4",
+    "cdp-langchain>=0.0.6",
+    "python-dotenv>=1.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

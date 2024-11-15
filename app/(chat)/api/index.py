@@ -3,7 +3,7 @@ import os
 import sys
 import time
 
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, AgentMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent
@@ -20,6 +20,7 @@ from os.path import dirname, abspath, join
 
 from flask import Flask
 from flask import request, json
+from dotenv import load_dotenv
 app = Flask("eth-talk")
 
 # Configure a file to persist the agent's CDP MPC Wallet Data.
@@ -27,7 +28,13 @@ wallet_data_file = "wallet_data.txt"
 
 dir = dirname(abspath(__file__))
 
-def initialize_agent(model: String = "gpt-4o-mini"):
+# Load OPENAI_API_KEY from environment variable or .env.local file
+if "OPENAI_API_KEY" not in os.environ:
+    load_dotenv(".env.local")
+
+# Rest of the code goes here...
+
+def initialize_agent(model: str = "gpt-4o-mini"):
     """Initialize the agent with CDP Agentkit."""
    # System prompt
     print("Initializing CDP Agentkit Chatbot...")
@@ -74,14 +81,14 @@ def initialize_agent(model: String = "gpt-4o-mini"):
     ), config
     
 # Reply to conversation
-def conversation_reply(agent_executor, config, user_input):
+def conversation_reply(agent_executor, config, messages):
     """Reply to a conversation."""
     
     reply = ""
     # Run agent with the user's input in chat mode
     # TODO: 
     for chunk in agent_executor.stream(
-        {"messages": [HumanMessage(content=user_input)]}, config):
+        {"messages": messages}, config):
         if "agent" in chunk:
             agent_reply = chunk["agent"]["messages"][0].content
             print(agent_reply)
@@ -100,5 +107,13 @@ def chat_reply():
     data = json.loads(request.data)
     print(data)
     agent_executor, config = initialize_agent()
-    reply = conversation_reply(agent_executor, config, "Hello")
+    messages = data["messages"]
+    langchain_messages = []
+    for message in messages:
+        if message["role"] == "user":
+            langchain_messages.append(HumanMessage(content=message["content"]))
+        elif message["role"] == "agent":
+            langchain_messages.append(AgentMessage(content=message["content"]))
+    reply = conversation_reply(agent_executor, config, langchain_messages)
+    # TODO: format reply as json
     return reply

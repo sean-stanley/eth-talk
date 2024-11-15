@@ -6,3 +6,4 @@ langgraph==0.2.48
 pydantic==2.9.2
 cdp-sdk==0.10.3
 Flask==3.0.3
+python-dotenv==1.0.1
