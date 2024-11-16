@@ -17,6 +17,7 @@ const STOP_TRIGGER_PHRASE = [
 
 export async function POST(request: Request) {
   const body = await request.json();
+  const userId = new URL(request.url).searchParams.get('userId');
   console.log(body);
 
   // Keywords
@@ -54,9 +55,9 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: body.id,
+          id: userId,
           messages: [{ role: 'user', content: textResponse.text }],
-          modelId: body.modelId,
+          modelId: 'gpt-4o',
         }),
       }
     );
