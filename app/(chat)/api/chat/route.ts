@@ -110,7 +110,7 @@ export async function POST(request: Request) {
     tools: {
       useWallet: {
         description:
-          'Access the users crypto wallet to check balances and perform transactions. The full list of options includes: get_wallet_details - Get details about the MPC Wallet\nGet balance for specific assets\nRequest test tokens from faucet\nTransfer assets between addresses\nTrade assets (Mainnet only)\nDeploy ERC-20 token contracts\nMint NFTs from existing contracts\nDeploy new NFT contracts\nRegister a basename for the wallet\nDeploy a token using Zora’s Wow Launcher (Bonding Curve)',
+          'Access crypto utils and the users crypto wallet to check balances and perform transactions. The full list of options includes: get_wallet_details - Get the latest quote for an asset, get transaction and trade history for an asset, transfer to an ens address, Get details about the MPC Wallet\nGet balance for specific assets\nRequest test tokens from faucet\nTransfer assets between addresses\nTrade assets (Mainnet only)\nDeploy ERC-20 token contracts\nMint NFTs from existing contracts\nDeploy new NFT contracts\nRegister a basename for the wallet\nDeploy a token using Zora’s Wow Launcher (Bonding Curve)',
         parameters: z.object({}),
         execute: async () => {
           try {
