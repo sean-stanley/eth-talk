@@ -14,12 +14,13 @@ import {
   useChainId,
   useConnect,
   useConnections,
-  useSignTypedData,
+  useSignTypedData
 } from 'wagmi';
 
-import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager';
+import { spendPermissionManagerAddress, spendPermissionManagerAbi } from '@/lib/abi/SpendPermissionManager';
 
 import { useConfig } from '../../app/(chat)/context/ConfigContext';
+import { ethers, Wallet } from 'ethers';
 
 const GRADIENT_BORDER_WIDTH = 2;
 
@@ -81,6 +82,7 @@ export function WalletButton({ height = 66, width = 200 }) {
   const { config } = useConfig(); // Access the config here
   const [isDisabled, setIsDisabled] = useState(false);
   const [signature, setSignature] = useState<Hex>();
+  const [agentWallet, setAgentWallet] = useState<Wallet>();
   const [spendPermission, setSpendPermission] = useState<object>();
 
   const { signTypedDataAsync } = useSignTypedData();
@@ -96,6 +98,27 @@ export function WalletButton({ height = 66, width = 200 }) {
   const buttonHeight = Math.max(minButtonHeight, height);
   const buttonWidth = Math.max(minButtonWidth, width);
   const gradientDiameter = Math.max(buttonHeight, buttonWidth);
+
+  console.log({ connectors })
+  const getEthersProvider = async () => {
+    const ethersProvider = new ethers.JsonRpcProvider('https://sepolia.base.org'); // Initialize Ethers provider
+    return ethersProvider;
+  }
+
+  const getAgentsWallet = useCallback(async () => {
+    const provider = await getEthersProvider();
+    const agentWallet = new ethers.Wallet(process.env.NEXT_PUBLIC_SPENDER_PRIVATE_KEY || '', provider);
+    setAgentWallet(agentWallet);
+  }, []);
+
+  const getSpendPermissionContract = () => {
+    return new ethers.Contract(spendPermissionManagerAddress, spendPermissionManagerAbi, agentWallet)
+  }
+
+  useEffect(() => {
+    getAgentsWallet();
+  }, [getAgentsWallet]);
+
   const styles: { [key: string]: React.CSSProperties } = useMemo(
     () => ({
       gradientContainer: {
@@ -162,6 +185,7 @@ export function WalletButton({ height = 66, width = 200 }) {
         const requestAccounts = await connectAsync({
           connector: connectors[0],
         });
+        console.log({ agentWallet })
         accountAddress = requestAccounts.accounts[0];
       } catch {
         return;
@@ -175,9 +199,9 @@ export function WalletButton({ height = 66, width = 200 }) {
       allowance: parseUnits(allowanceAmount, 18), // Passed allowance amount
       period: 86400, // seconds in a day
       start: 0, // unix timestamp
-      end: 281474976710655, // max uint48
+      end: 1763283144, // max uint48
       salt: BigInt(0),
-      extraData: '0x' as `0x${string}`,
+      extraData: '0x' as `0X${string}`
     };
 
     try {
@@ -207,9 +231,13 @@ export function WalletButton({ height = 66, width = 200 }) {
 
       setSpendPermission(spendPermission);
       setSignature(signature);
+      const spendPermissionContract = getSpendPermissionContract();
+      const tx = await spendPermissionContract.approveWithSignature(spendPermission, signature);
+      console.log({ tx })
 
       console.log('Spend Permission:', spendPermission);
       console.log('Signature:', signature);
+
 
       // Convert BigInt fields to string for serialization
       const serializedSpendPermission = {
