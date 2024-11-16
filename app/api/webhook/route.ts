@@ -1,6 +1,7 @@
-import { generateUUID } from '@/lib/utils';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+
+import { generateUUID } from '@/lib/utils';
 
 const START_TRIGGER_PHRASE = [
   'hey smart wallet',
