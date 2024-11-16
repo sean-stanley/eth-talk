@@ -65,9 +65,12 @@ export async function POST(request: Request) {
 
   let session = await auth();
 
+  console.log('session', session);
+
   if (!session || !session.user || !session.user.id) {
     // return new Response('Unauthorized', { status: 401 });
-    session = { user: { id }, expires: '' };
+    // TODO: use established user for testing/demos. Switch back to proper omi/app auth integration later.
+    session = { user: { id: '33cd7800-0f52-4fbf-9e4b-cab9f6742994' }, expires: '' };
   }
 
   const model = models.find((model) => model.id === modelId);
