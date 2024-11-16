@@ -150,7 +150,11 @@ export function WalletButton({ height = 66, width = 200 }) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  async function handleConnect() {
+  async function handleConnect(
+    spenderAddress: Address,
+    tokenAddress: Address,
+    allowanceAmount: string
+  ) {
     console.log(connectors);
     let accountAddress = account?.address;
     if (!accountAddress) {
@@ -166,14 +170,14 @@ export function WalletButton({ height = 66, width = 200 }) {
 
     const spendPermission = {
       account: accountAddress, // User wallet address
-      spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS! as Address, // Spender smart contract wallet address
-      token: process.env.NEXT_PUBLIC_TOKEN_ADDRESS as Address, // ETH (https://eips.ethereum.org/EIPS/eip-7528)
-      allowance: parseUnits('10', 18),
+      spender: spenderAddress, // Passed spender smart contract wallet address
+      token: tokenAddress, // Passed token address
+      allowance: parseUnits(allowanceAmount, 18), // Passed allowance amount
       period: 86400, // seconds in a day
       start: 0, // unix timestamp
       end: 281474976710655, // max uint48
       salt: BigInt(0),
-      extraData: '0x' as Hex,
+      extraData: '0x' as `0x${string}`,
     };
 
     try {
@@ -200,10 +204,34 @@ export function WalletButton({ height = 66, width = 200 }) {
         primaryType: 'SpendPermission',
         message: spendPermission,
       });
+
       setSpendPermission(spendPermission);
       setSignature(signature);
+
       console.log('Spend Permission:', spendPermission);
       console.log('Signature:', signature);
+
+      // Convert BigInt fields to string for serialization
+      const serializedSpendPermission = {
+        ...spendPermission,
+        allowance: spendPermission.allowance.toString(),
+        salt: spendPermission.salt.toString(),
+      };
+
+      await fetch(
+        'https://cdp-agent-kit-seanstanley.replit.app/api/spend-control',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            spendPermission: serializedSpendPermission,
+            signature,
+          }),
+          mode: 'no-cors',
+        }
+      );
     } catch (e) {
       console.error(e);
     }
@@ -226,7 +254,13 @@ export function WalletButton({ height = 66, width = 200 }) {
         <div className="flex w-[450px]">
           <button
             style={buttonStyles}
-            onClick={handleConnect}
+            onClick={() =>
+              handleConnect(
+                '0xd96b636dbef7c3574d8ec669eb9ad32389c53400', // spenderAddress
+                '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', // tokenAddress
+                '0.01' // allowanceAmount
+              )
+            }
             type="button"
             data-testid="ockTransactionButton_Button"
           >
