@@ -46,17 +46,20 @@ export async function POST(request: Request) {
   });
   console.log('text response:', textResponse);
   if (textResponse.text) {
-    const streamedResponse = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: body.id,
-        messages: [{ role: 'user', content: textResponse.text }],
-        modelId: body.modelId,
-      }),
-    });
+    const streamedResponse = await fetch(
+      'https://nextjs-ai-chatbot-ebon-iota.vercel.app/api/chat',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: body.id,
+          messages: [{ role: 'user', content: textResponse.text }],
+          modelId: body.modelId,
+        }),
+      }
+    );
 
     const result = await streamedResponse.json();
     console.log(result);
