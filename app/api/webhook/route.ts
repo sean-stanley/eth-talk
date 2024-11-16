@@ -17,6 +17,7 @@ const STOP_TRIGGER_PHRASE = [
 
 export async function POST(request: Request) {
   const body = await request.json();
+  console.log(body);
 
   // Keywords
   const cryptoKeywords = [
@@ -31,8 +32,10 @@ export async function POST(request: Request) {
   ];
 
   // Check the actionItems field for relevant keywords
-  const transcriptSegments = body.structured.transcript_segments.map((s) => s.text).join("\n");
-
+  const transcriptSegments = body.transcript_segments
+    .map((s: any) => s.text)
+    .join('\n');
+  
   console.log('transcribed text for the memory:', transcriptSegments);
 
   const textResponse = await generateText({
@@ -55,12 +58,12 @@ export async function POST(request: Request) {
       }),
     });
 
-      const result = await streamedResponse.json();
-      console.log(result);
+    const result = await streamedResponse.json();
+    console.log(result);
 
-      return new Response(JSON.stringify(streamedResponse), {
-        headers: { 'Content-Type': 'application/json' },
-      });
+    return new Response(JSON.stringify(streamedResponse), {
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   return new Response(
