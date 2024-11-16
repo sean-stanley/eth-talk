@@ -1,5 +1,7 @@
 'use client';
 
+import { ConfigProvider } from './context/ConfigContext';
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { base, baseSepolia } from 'wagmi/chains';
 import { http, cookieStorage, createConfig, createStorage } from 'wagmi';
@@ -36,21 +38,22 @@ export function Providers(props: {
 
   return (
     <WagmiProvider config={config} initialState={props.initialState}>
-      <QueryClientProvider client={queryClient}>
-        <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          // @ts-ignore
-          chain={base}
-          config={{
-            appearance: {
-              mode: 'auto',
-              theme: 'base',
-            },
-          }}
-        >
-          {props.children}
-        </OnchainKitProvider>
-      </QueryClientProvider>
+      <ConfigProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <OnchainKitProvider
+            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            chain={base}
+            config={{
+              appearance: {
+                mode: 'auto',
+                theme: 'base',
+              },
+            }}
+          >
+            {props.children}
+          </OnchainKitProvider>
+        </QueryClientProvider>
+      </ConfigProvider>
     </WagmiProvider>
   );
 }

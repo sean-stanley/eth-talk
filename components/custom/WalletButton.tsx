@@ -2,9 +2,18 @@
 
 import { Address, Hex, parseUnits } from 'viem';
 import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager';
+import { useConfig } from '../../app/(chat)/context/ConfigContext';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount, useChainId, useConnect, useSignTypedData } from 'wagmi';
+import {
+  useAccount,
+  useChainId,
+  useConnect,
+  useConnections,
+  useSignTypedData,
+} from 'wagmi';
+import { disconnect } from '@wagmi/core';
+import { config } from 'dotenv';
 
 const GRADIENT_BORDER_WIDTH = 2;
 
@@ -65,6 +74,7 @@ function Gradient({
 }
 
 export function WalletButton({ height = 66, width = 200 }) {
+  const { config } = useConfig(); // Access the config here
   const [isDisabled, setIsDisabled] = useState(false);
   const [signature, setSignature] = useState<Hex>();
   const [spendPermission, setSpendPermission] = useState<object>();
@@ -75,8 +85,8 @@ export function WalletButton({ height = 66, width = 200 }) {
   const { connectAsync } = useConnect();
 
   const { connectors, connect } = useConnect();
-  console.log({ chainId })
-
+  console.log({ chainId });
+  console.log(account.address);
   const minButtonHeight = 48;
   const minButtonWidth = 200;
   const buttonHeight = Math.max(minButtonHeight, height);
@@ -136,9 +146,8 @@ export function WalletButton({ height = 66, width = 200 }) {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  async function handleSubmit() {
-    setIsDisabled(true);
-    console.log(connectors)
+  async function handleConnect() {
+    console.log(connectors);
     let accountAddress = account?.address;
     if (!accountAddress) {
       try {
@@ -195,40 +204,14 @@ export function WalletButton({ height = 66, width = 200 }) {
     setIsDisabled(false);
   }
 
-  // We send the permission details and the user signature to our backend route
-  async function handleCollectSubscription() {
-    setIsDisabled(true);
-    let data;
+  async function handleDisconnect() {
     try {
-      const replacer = (key: string, value: any) => {
-        if (typeof value === 'bigint') {
-          return value.toString();
-        }
-        return value;
-      };
-      const response = await fetch('/collect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          {
-            spendPermission,
-            signature,
-            dummyData: Math.ceil(Math.random() * 100),
-          },
-          replacer
-        ),
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      data = await response.json();
+      // Disconnect from the wallet
+      await disconnect(config);
+      console.log('Disconnected from wallet.');
     } catch (e) {
-      console.error(e);
+      console.error('Error during disconnect:', e);
     }
-    setIsDisabled(false);
-    return data;
   }
 
   return (
@@ -237,9 +220,8 @@ export function WalletButton({ height = 66, width = 200 }) {
         <div className="flex w-[450px]">
           <button
             style={buttonStyles}
-            onClick={handleSubmit}
+            onClick={handleConnect}
             type="button"
-            disabled={isDisabled}
             data-testid="ockTransactionButton_Button"
           >
             <div style={styles.gradientContainer}>
@@ -256,8 +238,8 @@ export function WalletButton({ height = 66, width = 200 }) {
         <div className="flex w-[450px]">
           <button
             style={buttonStyles}
+            onClick={handleDisconnect}
             type="button"
-            disabled={isDisabled}
             data-testid="ockTransactionButton_Button"
           >
             <div style={styles.gradientContainer}>
