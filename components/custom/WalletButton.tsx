@@ -198,6 +198,8 @@ export function WalletButton({ height = 66, width = 200 }) {
       });
       setSpendPermission(spendPermission);
       setSignature(signature);
+      console.log('Spend Permission:', spendPermission);
+      console.log('Signature:', signature);
     } catch (e) {
       console.error(e);
     }
