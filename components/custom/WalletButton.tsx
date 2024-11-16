@@ -1,10 +1,14 @@
 'use client';
 
+import { disconnect } from '@wagmi/core';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react';
 import { Address, Hex, parseUnits } from 'viem';
-import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager';
-import { useConfig } from '../../app/(chat)/context/ConfigContext';
-
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   useAccount,
   useChainId,
@@ -12,8 +16,10 @@ import {
   useConnections,
   useSignTypedData,
 } from 'wagmi';
-import { disconnect } from '@wagmi/core';
-import { config } from 'dotenv';
+
+import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager';
+
+import { useConfig } from '../../app/(chat)/context/ConfigContext';
 
 const GRADIENT_BORDER_WIDTH = 2;
 
@@ -26,8 +32,6 @@ const buttonStyles = {
 const contentWrapperStyle: React.CSSProperties = {
   position: 'relative',
 };
-
-import { ReactNode } from 'react';
 
 function Gradient({
   children,

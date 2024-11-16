@@ -6,13 +6,13 @@ import { useWindowSize } from 'usehooks-ts';
 
 import { ModelSelector } from '@/components/custom/model-selector';
 import { SidebarToggle } from '@/components/custom/sidebar-toggle';
+import { WalletButton } from '@/components/custom/WalletButton';
 import { Button } from '@/components/ui/button';
 import { BetterTooltip } from '@/components/ui/tooltip';
 
 import { PlusIcon, VercelIcon } from './icons';
-import { useSidebar } from '../ui/sidebar';
-import { WalletButton } from '@/components/custom/WalletButton'; // Import WalletButton
 import { Providers } from '../../app/(chat)/providers';
+import { useSidebar } from '../ui/sidebar';
 
 export function ChatHeader({ selectedModelId }: { selectedModelId: string }) {
   const router = useRouter();

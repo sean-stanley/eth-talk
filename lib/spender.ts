@@ -1,6 +1,6 @@
 import { createPublicClient, createWalletClient, Hex, http } from 'viem';
-import { baseSepolia } from 'viem/chains';
 import { privateKeyToAccount } from 'viem/accounts';
+import { baseSepolia } from 'viem/chains';
 
 export async function getPublicClient() {
   const client = createPublicClient({

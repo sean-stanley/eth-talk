@@ -1,14 +1,20 @@
 'use client';
 
-import { ConfigProvider } from './context/ConfigContext';
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { base, baseSepolia } from 'wagmi/chains';
-import { http, cookieStorage, createConfig, createStorage } from 'wagmi';
-import { coinbaseWallet } from 'wagmi/connectors';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState, useEffect } from 'react';
-import { type State, WagmiProvider } from 'wagmi';
+import {
+  http,
+  cookieStorage,
+  createConfig,
+  createStorage,
+  type State,
+  WagmiProvider,
+} from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
+import { coinbaseWallet } from 'wagmi/connectors';
+
+import { ConfigProvider } from './context/ConfigContext';
 import { getFromNillion } from './nillion';
 
 const config = createConfig({
@@ -39,7 +45,10 @@ export function Providers(props: {
   useEffect(() => {
     const fetchApiKey = async () => {
       try {
-        const key = await getFromNillion('f5e028fe-b69b-41b7-b1c1-171ee7c191ea', 'ON_CHAIN_KIT_KEY');
+        const key = await getFromNillion(
+          'f5e028fe-b69b-41b7-b1c1-171ee7c191ea',
+          'ON_CHAIN_KIT_KEY'
+        );
         setApiKey(key.secret);
       } catch (error) {
         console.error('Error fetching Nillion API key:', error);

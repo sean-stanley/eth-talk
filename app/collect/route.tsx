@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getPublicClient, getSpenderWalletClient } from '../../lib/spender';
+
 import {
   spendPermissionManagerAbi,
   spendPermissionManagerAddress,
 } from '../../lib/abi/SpendPermissionManager';
+import { getPublicClient, getSpenderWalletClient } from '../../lib/spender';
 
 export async function POST(request: NextRequest) {
   const spenderBundlerClient = await getSpenderWalletClient();
