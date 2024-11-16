@@ -2,7 +2,7 @@ import React from 'react';
 
 export const CoinbaseWalletLogo: React.FC = () => (
   <img
-    src="../../public/images/coinbase.png"
+    src="../../public/coinbase-wallet-logo.png"
     alt="Coinbase Wallet Logo"
     style={{
       width: 24,

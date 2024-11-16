@@ -7,8 +7,9 @@ import { base, baseSepolia } from 'wagmi/chains';
 import { http, cookieStorage, createConfig, createStorage } from 'wagmi';
 import { coinbaseWallet } from 'wagmi/connectors';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { type State, WagmiProvider } from 'wagmi';
+import { getFromNillion } from './nillion';
 
 const config = createConfig({
   chains: [baseSepolia],
@@ -35,13 +36,27 @@ export function Providers(props: {
   initialState?: State;
 }) {
   const [queryClient] = useState(() => new QueryClient());
+  const [apiKey, setApiKey] = useState<string>('');
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const key = await getFromNillion('f5e028fe-b69b-41b7-b1c1-171ee7c191ea', 'ON_CHAIN_KIT_KEY');
+        setApiKey(key.secret);
+      } catch (error) {
+        console.error('Error fetching Nillion API key:', error);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
 
   return (
     <WagmiProvider config={config} initialState={props.initialState}>
       <ConfigProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <OnchainKitProvider
-            apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+            apiKey={apiKey}
+            // @ts-ignore
             chain={base}
             config={{
               appearance: {
