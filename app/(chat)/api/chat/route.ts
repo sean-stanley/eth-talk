@@ -110,27 +110,34 @@ export async function POST(request: Request) {
           'Access the users crypto wallet to check balances and perform transactions. The full list of options includes: get_wallet_details - Get details about the MPC Wallet\nGet balance for specific assets\nRequest test tokens from faucet\nTransfer assets between addresses\nTrade assets (Mainnet only)\nDeploy ERC-20 token contracts\nMint NFTs from existing contracts\nDeploy new NFT contracts\nRegister a basename for the wallet\nDeploy a token using Zora’s Wow Launcher (Bonding Curve)',
         parameters: z.object({}),
         execute: async () => {
-          console.log("Executing 'useWallet' tool");
-          try { const response = await fetch(
-            `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                messages: messages,
-                // todo: wallet info
-              }),
-            }
-          );
+          try {
+            const response = await fetch(
+              `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  messages: messages,
+                  // todo: wallet info
+                }),
+              }
+            );
 
-          const walletData = await response.json();
-          return walletData;
-        }
-          catch (err) {
+            const walletData = await response.json();
+
+            streamingData.append({
+              type: 'clear',
+              content: '',
+            });
+
+            return walletData.message;
+          } catch (err) {
             console.error(err);
-            return { message: 'An error occurred while processing your request' };
+            return {
+              message: 'An error occurred while processing your request',
+            };
           }
         },
       },
