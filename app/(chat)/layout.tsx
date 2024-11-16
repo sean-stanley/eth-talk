@@ -5,6 +5,8 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 import { auth } from '../(auth)/auth';
 
+import { Providers } from './providers';
+
 export const experimental_ppr = true;
 
 export default async function Layout({
@@ -18,7 +20,9 @@ export default async function Layout({
   return (
     <SidebarProvider defaultOpen={!isCollapsed}>
       <AppSidebar user={session?.user} />
-      <SidebarInset>{children}</SidebarInset>
+      <SidebarInset>
+        <Providers>{children}</Providers>
+      </SidebarInset>
     </SidebarProvider>
   );
 }
