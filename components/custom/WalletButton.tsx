@@ -1,127 +1,133 @@
-'use client';
-
-import { useEffect, useState, useCallback } from 'react';
-import { createCoinbaseWalletSDK } from '@coinbase/wallet-sdk'; // Import inside useEffect to ensure it's only used client-side
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useConnect } from 'wagmi';
 import { CoinbaseWalletLogo } from './CoinbaseWalletLogo';
-import { useSignTypedData } from 'wagmi'; // Assuming wagmi for signing typed data
-import { parseUnits } from 'viem'; // For unit conversion
+
+const GRADIENT_BORDER_WIDTH = 2;
 
 const buttonStyles = {
   background: 'transparent',
   border: '1px solid transparent',
-  boxSizing: 'border-box' as const,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  width: 200,
-  fontFamily: 'Arial, sans-serif',
-  fontWeight: 'bold',
-  fontSize: 18,
-  backgroundColor: '#0052FF',
-  paddingLeft: 15,
-  paddingRight: 30,
-  borderRadius: 10,
+  boxSizing: 'border-box' as 'border-box',
 };
 
-export function WalletButton({
-  handleSuccess,
-  handleError,
+const contentWrapperStyle: React.CSSProperties = {
+  position: 'relative',
+};
+
+import { ReactNode } from 'react';
+
+function Gradient({
+  children,
+  style,
+  isAnimationDisabled = false,
 }: {
-  handleSuccess: (address: string) => void;
-  handleError: (error: unknown) => void;
+  children: ReactNode;
+  style: React.CSSProperties;
+  isAnimationDisabled?: boolean;
 }) {
-  const [loading, setLoading] = useState(false);
-  const [coinbaseSDK, setCoinbaseSDK] = useState<ReturnType<
-    typeof createCoinbaseWalletSDK
-  > | null>(null);
-  const [isConnected, setIsConnected] = useState(false); // New state for tracking the connection
-  const [spendPermission, setSpendPermission] = useState<object | null>(null); // State for spend permission
-  const { signTypedDataAsync } = useSignTypedData(); // For signing the typed data
+  const [isAnimating, setIsAnimating] = useState(false);
+  const gradientStyle = useMemo(() => {
+    const rotate = isAnimating ? '720deg' : '0deg';
+    return {
+      transform: `rotate(${rotate})`,
+      transition: isAnimating
+        ? 'transform 2s cubic-bezier(0.27, 0, 0.24, 0.99)'
+        : 'none',
+      ...style,
+    };
+  }, [isAnimating, style]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (isAnimationDisabled || isAnimating) return;
+    setIsAnimating(true);
+  }, [isAnimationDisabled, isAnimating, setIsAnimating]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const sdk = createCoinbaseWalletSDK({
-        appName: 'My Dapp',
-        appLogoUrl: 'https://example.com/logo.png',
-        appChainIds: [84532], // Modify the chain ID as needed
-      });
-      setCoinbaseSDK(sdk); // Set the SDK only in the client
-    }
-  }, []);
-
-  const createWallet = useCallback(async () => {
-    if (!coinbaseSDK) return; // Wait for SDK to be initialized
-
-    try {
-      setLoading(true); // Start loading when attempting to create a wallet
-      const provider = coinbaseSDK.getProvider();
-      const accounts = (await provider.request({
-        method: 'eth_requestAccounts',
-      })) as string[];
-      const [address] = accounts;
-      handleSuccess(address); // Pass the address to the success handler
-      setIsConnected(true); // Set the connection state to true once the wallet is connected
-
-      // Generate spend permission data
-      const spendPermissionData = {
-        account: address as `0x${string}`, // User wallet address
-        spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS! as `0x${string}`, // Spender smart contract address
-        token: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' as `0x${string}`, // ETH
-        allowance: parseUnits('10', 18), // 10 tokens allowance (adjust the amount as needed)
-        period: 86400, // seconds in a day
-        start: 0, // unix timestamp for start
-        end: 281474976710655, // max uint48
-        salt: BigInt(0), // Can be random
-        extraData: '0x' as `0x${string}`, // Optional extra data
-      };
-
-      // Sign the spend permission data
-      const signature = await signTypedDataAsync({
-        domain: {
-          name: 'Spend Permission Manager',
-          version: '1',
-          chainId: 84532, // Chain ID (modify as needed)
-          verifyingContract: process.env
-            .NEXT_PUBLIC_SPENDER_ADDRESS as `0x${string}`, // Spender contract address
-        },
-        types: {
-          SpendPermission: [
-            { name: 'account', type: 'address' },
-            { name: 'spender', type: 'address' },
-            { name: 'token', type: 'address' },
-            { name: 'allowance', type: 'uint160' },
-            { name: 'period', type: 'uint48' },
-            { name: 'start', type: 'uint48' },
-            { name: 'end', type: 'uint48' },
-            { name: 'salt', type: 'uint256' },
-            { name: 'extraData', type: 'bytes' },
-          ],
-        },
-        primaryType: 'SpendPermission',
-        message: spendPermissionData,
-      });
-
-      setSpendPermission({ ...spendPermissionData, signature }); // Store the spend permission and signature
-    } catch (error) {
-      handleError(error); // Handle errors
-    } finally {
-      setLoading(false); // Stop loading once the operation is done
-    }
-  }, [coinbaseSDK, handleSuccess, handleError, signTypedDataAsync]);
+    if (!isAnimating) return;
+    const animationTimeout = setTimeout(() => {
+      setIsAnimating(false);
+    }, 2000);
+    return () => {
+      clearTimeout(animationTimeout);
+    };
+  }, [isAnimating]);
 
   return (
-    <button
-      style={buttonStyles}
-      onClick={createWallet}
-      disabled={loading || isConnected} // Disable button if already connected
-    >
-      <CoinbaseWalletLogo />
-      {loading
-        ? 'Connecting...'
-        : isConnected
-          ? 'Connected'
-          : 'Create Wallet'}{' '}
-      {/* Button text */}
+    <div style={contentWrapperStyle} onMouseEnter={handleMouseEnter}>
+      <div className="gradient-background" style={gradientStyle} />
+      {children}
+    </div>
+  );
+}
+
+export function WalletButton({ height = 66, width = 200 }) {
+  const { connectors, connect } = useConnect();
+
+  const minButtonHeight = 48;
+  const minButtonWidth = 200;
+  const buttonHeight = Math.max(minButtonHeight, height);
+  const buttonWidth = Math.max(minButtonWidth, width);
+  const gradientDiameter = Math.max(buttonHeight, buttonWidth);
+  const styles: { [key: string]: React.CSSProperties } = useMemo(
+    () => ({
+      gradientContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'black',
+        borderRadius: buttonHeight / 2,
+        height: buttonHeight,
+        width: buttonWidth,
+        boxSizing: 'border-box' as 'border-box',
+        overflow: 'hidden',
+      },
+      gradient: {
+        background:
+          'conic-gradient(from 180deg, #45E1E5 0deg, #0052FF 86.4deg, #B82EA4 165.6deg, #FF9533 255.6deg, #7FD057 320.4deg, #45E1E5 360deg)',
+        position: 'absolute',
+        top: -buttonHeight - GRADIENT_BORDER_WIDTH,
+        left: -GRADIENT_BORDER_WIDTH,
+        width: gradientDiameter,
+        height: gradientDiameter,
+      },
+      buttonBody: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        boxSizing: 'border-box',
+        backgroundColor: '#000000',
+        height: buttonHeight - GRADIENT_BORDER_WIDTH * 2,
+        width: buttonWidth - GRADIENT_BORDER_WIDTH * 2,
+        fontFamily: 'Arial, sans-serif',
+        fontWeight: 'bold',
+        fontSize: 18,
+        borderRadius: buttonHeight / 2,
+        position: 'relative',
+        paddingRight: 10,
+      },
+    }),
+    [buttonHeight, buttonWidth, gradientDiameter]
+  );
+
+  const createWallet = useCallback(() => {
+    const coinbaseWalletConnector = connectors.find(
+      (connector) => connector.id === 'coinbaseWalletSDK'
+    );
+    if (coinbaseWalletConnector) {
+      connect({ connector: coinbaseWalletConnector });
+    }
+  }, [connectors, connect]);
+
+  return (
+    <button style={buttonStyles} onClick={createWallet}>
+      <div style={styles.gradientContainer}>
+        <Gradient style={styles.gradient}>
+          <div style={styles.buttonBody}>
+            <CoinbaseWalletLogo />
+            Create Wallet
+          </div>
+        </Gradient>
+      </div>
     </button>
   );
 }
