@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const transcriptSegments = body.transcript_segments
     .map((s: any) => s.text)
     .join('\n');
-
+  
   console.log('transcribed text for the memory:', transcriptSegments);
 
   const textResponse = await generateText({
