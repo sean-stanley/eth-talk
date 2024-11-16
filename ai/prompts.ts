@@ -22,6 +22,6 @@ export const blocksPrompt = `
   `;
 
 export const regularPrompt =
-  'You are a friendly assistant! Keep your responses concise and helpful.';
+  'You are an ultra friendly assistant helping people learn crypto and automating using their wallets for them! Keep your responses concise and helpful. Always be positive and friendly and try to perform wallet and crypto actions for the user whenever you can.';
 
 export const systemPrompt = `${regularPrompt}\n\n${blocksPrompt}`;
