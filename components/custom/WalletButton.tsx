@@ -1,18 +1,10 @@
 'use client';
 
-import { cn, color, pressable, text } from '@coinbase/onchainkit/theme';
 import { Address, Hex, parseUnits } from 'viem';
-import { useQuery } from '@tanstack/react-query';
 import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  useAccount,
-  useChainId,
-  useConnect,
-  useConnectors,
-  useSignTypedData,
-} from 'wagmi';
+import { useAccount, useChainId, useConnect, useSignTypedData } from 'wagmi';
 import { CoinbaseWalletLogo } from './CoinbaseWalletLogo';
 
 const GRADIENT_BORDER_WIDTH = 2;
@@ -196,6 +188,42 @@ export function WalletButton({ height = 66, width = 200 }) {
       console.error(e);
     }
     setIsDisabled(false);
+  }
+
+  // We send the permission details and the user signature to our backend route
+  async function handleCollectSubscription() {
+    setIsDisabled(true);
+    let data;
+    try {
+      const replacer = (key: string, value: any) => {
+        if (typeof value === 'bigint') {
+          return value.toString();
+        }
+        return value;
+      };
+      const response = await fetch('/collect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          {
+            spendPermission,
+            signature,
+            dummyData: Math.ceil(Math.random() * 100),
+          },
+          replacer
+        ),
+      });
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      data = await response.json();
+    } catch (e) {
+      console.error(e);
+    }
+    setIsDisabled(false);
+    return data;
   }
 
   return (
