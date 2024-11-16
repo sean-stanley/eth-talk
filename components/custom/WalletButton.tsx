@@ -5,7 +5,6 @@ import { spendPermissionManagerAddress } from '@/lib/abi/SpendPermissionManager'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount, useChainId, useConnect, useSignTypedData } from 'wagmi';
-import { CoinbaseWalletLogo } from './CoinbaseWalletLogo';
 
 const GRADIENT_BORDER_WIDTH = 2;
 
@@ -76,6 +75,7 @@ export function WalletButton({ height = 66, width = 200 }) {
   const { connectAsync } = useConnect();
 
   const { connectors, connect } = useConnect();
+  console.log({ chainId })
 
   const minButtonHeight = 48;
   const minButtonWidth = 200;
@@ -132,8 +132,13 @@ export function WalletButton({ height = 66, width = 200 }) {
     }
   }, [connectors, connect]);
 
+  const trim = (address: string | `0x${string}`) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   async function handleSubmit() {
     setIsDisabled(true);
+    console.log(connectors)
     let accountAddress = account?.address;
     if (!accountAddress) {
       try {
@@ -149,7 +154,7 @@ export function WalletButton({ height = 66, width = 200 }) {
     const spendPermission = {
       account: accountAddress, // User wallet address
       spender: process.env.NEXT_PUBLIC_SPENDER_ADDRESS! as Address, // Spender smart contract wallet address
-      token: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' as Address, // ETH (https://eips.ethereum.org/EIPS/eip-7528)
+      token: process.env.NEXT_PUBLIC_TOKEN_ADDRESS as Address, // ETH (https://eips.ethereum.org/EIPS/eip-7528)
       allowance: parseUnits('10', 18),
       period: 86400, // seconds in a day
       start: 0, // unix timestamp
@@ -228,7 +233,7 @@ export function WalletButton({ height = 66, width = 200 }) {
 
   return (
     <div>
-      {!signature ? (
+      {!account ? (
         <div className="flex w-[450px]">
           <button
             style={buttonStyles}
@@ -240,7 +245,7 @@ export function WalletButton({ height = 66, width = 200 }) {
             <div style={styles.gradientContainer}>
               <Gradient style={styles.gradient}>
                 <div style={styles.buttonBody}>
-                  <CoinbaseWalletLogo />
+                  {/* <CoinbaseWalletLogo /> */}
                   Connect
                 </div>
               </Gradient>
@@ -258,8 +263,8 @@ export function WalletButton({ height = 66, width = 200 }) {
             <div style={styles.gradientContainer}>
               <Gradient style={styles.gradient}>
                 <div style={styles.buttonBody}>
-                  <CoinbaseWalletLogo />
-                  Connected
+                  {/* <CoinbaseWalletLogo /> */}
+                  {account?.address ? trim(account?.address) : 'N/A'}
                 </div>
               </Gradient>
             </div>
