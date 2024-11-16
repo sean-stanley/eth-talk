@@ -12,6 +12,7 @@ coverage
 .next/
 out/
 build
+play/
 
 # misc
 .DS_Store
