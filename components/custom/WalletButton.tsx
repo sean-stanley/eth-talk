@@ -216,7 +216,7 @@ export function WalletButton({ height = 66, width = 200 }) {
 
   return (
     <div>
-      {!account ? (
+      {!account.address ? (
         <div className="flex w-[450px]">
           <button
             style={buttonStyles}
