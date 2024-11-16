@@ -60,14 +60,14 @@ export async function POST(request: Request) {
     messages,
     modelId,
     // todo: include wallet info
-  }: { id: string; messages: Array<Message>; modelId: string } =
+  }: { id: string; messages: Array<Message>; modelId: string; } =
     await request.json();
 
   let session = await auth();
 
   if (!session || !session.user || !session.user.id) {
     // return new Response('Unauthorized', { status: 401 });
-    session = { user: { id: 'guest' }, expires: '' }
+    session = { user: { id }, expires: '' };
   }
 
   const model = models.find((model) => model.id === modelId);
