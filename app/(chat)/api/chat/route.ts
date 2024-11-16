@@ -35,7 +35,8 @@ type AllowedTools =
   | 'createDocument'
   | 'updateDocument'
   | 'requestSuggestions'
-  | 'getWeather';
+  | 'getWeather'
+  | 'useWallet';
 
 const blocksTools: AllowedTools[] = [
   'createDocument',
@@ -45,13 +46,20 @@ const blocksTools: AllowedTools[] = [
 
 const weatherTools: AllowedTools[] = ['getWeather'];
 
-const allTools: AllowedTools[] = [...blocksTools, ...weatherTools];
+const walletTools: AllowedTools[] = ['useWallet'];
+
+const allTools: AllowedTools[] = [
+  ...blocksTools,
+  ...weatherTools,
+  ...walletTools,
+];
 
 export async function POST(request: Request) {
   const {
     id,
     messages,
     modelId,
+    // todo: include wallet info
   }: { id: string; messages: Array<Message>; modelId: string } =
     await request.json();
 
@@ -96,6 +104,30 @@ export async function POST(request: Request) {
     maxSteps: 5,
     experimental_activeTools: allTools,
     tools: {
+      useWallet: {
+        description:
+          'Access the users crypto wallet to check balances and perform transactions',
+        parameters: z.object({}),
+        execute: async () => {
+          const response = await fetch(
+            `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                messages: messages,
+                // todo: wallet info
+              }),
+            }
+          );
+
+          const walletData = await response.json();
+          return walletData;
+        },
+      },
+
       getWeather: {
         description: 'Get the current weather at a location',
         parameters: z.object({

@@ -1,0 +1,1 @@
+{"wallet_id": "cce04d25-ab0d-41ee-9e4c-a198ee9ee739", "seed": "7270102e9e7a547c70136e74f02a26d56eb71d5f97aeb5f2ff62fcefc3ab12bfcfd45f637a0e523009769b692c4919f5f93fb4f09721604121a4b45de2dcbdbd", "default_address_id": "0xD96b636DbEF7c3574d8Ec669EB9ad32389C53400"}

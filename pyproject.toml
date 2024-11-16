@@ -1,0 +1,34 @@
+[project]
+name = "eth-talk"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Sean Stanley", email = "sean@redheadweb.nz" }
+]
+dependencies = [
+    "flask>=3.1.0",
+    "cdp-sdk>=0.10.3",
+    "pydantic>=2.9.2",
+    "langgraph>=0.2.48",
+    "langchain-openai>=0.2.8",
+    "langchain-core>=0.3.19",
+    "cdp-agentkit-core>=0.0.4",
+    "cdp-langchain>=0.0.6",
+    "python-dotenv>=1.0.1",
+]
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eth_talk"]
