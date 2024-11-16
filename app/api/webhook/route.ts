@@ -1,3 +1,4 @@
+import { generateUUID } from '@/lib/utils';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
@@ -17,7 +18,7 @@ const STOP_TRIGGER_PHRASE = [
 
 export async function POST(request: Request) {
   const body = await request.json();
-  const userId = new URL(request.url).searchParams.get('userId');
+  const userId = new URL(request.url).searchParams.get('uid');
   console.log(body);
 
   // Keywords
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   const transcriptSegments = body.transcript_segments
     .map((s: any) => s.text)
     .join('\n');
-  
+
   console.log('transcribed text for the memory:', transcriptSegments);
 
   const textResponse = await generateText({
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          id: userId,
+          id: generateUUID(),
           messages: [{ role: 'user', content: textResponse.text }],
           modelId: 'gpt-4o',
         }),
