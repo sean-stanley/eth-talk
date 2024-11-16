@@ -1,5 +1,3 @@
-// import { default as stream } from 'node:stream';
-import type { ReadableStream } from 'node:stream/web';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 
