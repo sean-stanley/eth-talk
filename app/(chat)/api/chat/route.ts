@@ -109,7 +109,8 @@ export async function POST(request: Request) {
           'Access the users crypto wallet to check balances and perform transactions',
         parameters: z.object({}),
         execute: async () => {
-          const response = await fetch(
+          console.log("Executing 'useWallet' tool");
+          try { const response = await fetch(
             `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
             {
               method: 'POST',
@@ -125,6 +126,11 @@ export async function POST(request: Request) {
 
           const walletData = await response.json();
           return walletData;
+        }
+          catch (err) {
+            console.error(err);
+            return { message: 'An error occurred while processing your request' };
+          }
         },
       },
 
