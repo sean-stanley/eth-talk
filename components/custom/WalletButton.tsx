@@ -76,20 +76,12 @@ function Gradient({
 export function WalletButton({ height = 66, width = 200 }) {
   const [isDisabled, setIsDisabled] = useState(false);
   const [signature, setSignature] = useState<Hex>();
-  const [transactions, setTransactions] = useState<Hex[]>([]);
   const [spendPermission, setSpendPermission] = useState<object>();
 
   const { signTypedDataAsync } = useSignTypedData();
   const account = useAccount();
   const chainId = useChainId();
   const { connectAsync } = useConnect();
-
-  const { data, error, isLoading, refetch } = useQuery({
-    queryKey: ['collectSubscription'],
-    queryFn: handleCollectSubscription,
-    refetchOnWindowFocus: false,
-    enabled: !!signature,
-  });
 
   const { connectors, connect } = useConnect();
 
@@ -206,46 +198,6 @@ export function WalletButton({ height = 66, width = 200 }) {
     setIsDisabled(false);
   }
 
-  async function handleCollectSubscription() {
-    setIsDisabled(true);
-    let data;
-    try {
-      const replacer = (key: string, value: any) => {
-        if (typeof value === 'bigint') {
-          return value.toString();
-        }
-        return value;
-      };
-      const response = await fetch('/collect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          {
-            spendPermission,
-            signature,
-            dummyData: Math.ceil(Math.random() * 100),
-          },
-          replacer
-        ),
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      data = await response.json();
-    } catch (e) {
-      console.error(e);
-    }
-    setIsDisabled(false);
-    return data;
-  }
-
-  useEffect(() => {
-    if (!data) return;
-    setTransactions([data?.transactionHash, ...transactions]);
-  }, [data]);
-
   return (
     <div>
       {!signature ? (
@@ -261,44 +213,29 @@ export function WalletButton({ height = 66, width = 200 }) {
               <Gradient style={styles.gradient}>
                 <div style={styles.buttonBody}>
                   <CoinbaseWalletLogo />
-                  Subscribe
+                  Connect
                 </div>
               </Gradient>
             </div>
           </button>
         </div>
       ) : (
-        <div className="space-y-8 w-[450px]">
-          <div className="flex">
-            <button
-              style={buttonStyles}
-              onClick={() => refetch()}
-              type="button"
-              disabled={isDisabled}
-              data-testid="collectSubscriptionButton_Button"
-            >
-              <div style={styles.gradientContainer}>
-                <Gradient style={styles.gradient}>
-                  <div style={styles.buttonBody}>Collect Subscription</div>
-                </Gradient>
-              </div>
-            </button>
-          </div>
-          <div className="h-80 space-y-4 relative">
-            <div className="text-lg font-bold">Subscription Payments</div>
-            <div className="flex flex-col">
-              {transactions.map((transactionHash, i) => (
-                <a
-                  key={i}
-                  className="hover:underline text-ellipsis truncate"
-                  target="_blank"
-                  href={`https://sepolia.basescan.org/tx/${transactionHash}`}
-                >
-                  View transaction {transactionHash}
-                </a>
-              ))}
+        <div className="flex w-[450px]">
+          <button
+            style={buttonStyles}
+            type="button"
+            disabled={isDisabled}
+            data-testid="ockTransactionButton_Button"
+          >
+            <div style={styles.gradientContainer}>
+              <Gradient style={styles.gradient}>
+                <div style={styles.buttonBody}>
+                  <CoinbaseWalletLogo />
+                  Connected
+                </div>
+              </Gradient>
             </div>
-          </div>
+          </button>
         </div>
       )}
     </div>
