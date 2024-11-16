@@ -88,6 +88,8 @@ export const PreviewMessage = ({
                           block={block}
                           setBlock={setBlock}
                         />
+                      ) : toolName === 'useWallet' ? (
+                        <span className="text-gray-500">Using CDP AgentKit...</span>
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
                       )}
