@@ -59,6 +59,7 @@ export async function POST(request: Request) {
     id,
     messages,
     modelId,
+    // todo: include wallet info
   }: { id: string; messages: Array<Message>; modelId: string } =
     await request.json();
 
@@ -107,8 +108,7 @@ export async function POST(request: Request) {
         description:
           'Access the users crypto wallet to check balances and perform transactions',
         parameters: z.object({}),
-
-        execute: async ({}) => {
+        execute: async () => {
           const response = await fetch(
             `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
             {
@@ -118,6 +118,7 @@ export async function POST(request: Request) {
               },
               body: JSON.stringify({
                 messages: messages,
+                // todo: wallet info
               }),
             }
           );
