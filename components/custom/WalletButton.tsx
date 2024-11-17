@@ -260,33 +260,33 @@ export function WalletButton({ height = 66, width = 200 }) {
         salt: spendPermission.salt.toString(),
       };
 
-      await fetch(
-        'https://cdp-agent-kit-seanstanley.replit.app/api/spend-control',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            spendPermission: serializedSpendPermission,
-            signature,
-          }),
-          mode: 'no-cors',
-        }
-      );
+      // await fetch(
+      //   'https://cdp-agent-kit-seanstanley.replit.app/api/spend-control',
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       spendPermission: serializedSpendPermission,
+      //       signature,
+      //     }),
+      //     mode: 'no-cors',
+      //   }
+      // );
 
-      await fetch(
-        'https://cdp-agent-kit-seanstanley.replit.app/api/edit-wallet',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            address: accountAddress,
-          }),
-        }
-      );
+      // await fetch(
+      //   'https://cdp-agent-kit-seanstanley.replit.app/api/edit-wallet',
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       address: accountAddress,
+      //     }),
+      //   }
+      // );
     } catch (e) {
       console.error(e);
     }
