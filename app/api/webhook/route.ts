@@ -1,5 +1,16 @@
+const START_TRIGGER_PHRASE = [
+  'hey smart wallet',
+  'hey, mart wallet',
+  'hey matts wallet,',
+  'hey smot wallet',
+];
 
-
+const STOP_TRIGGER_PHRASE = [
+  'thanks smart wallet',
+  'thanks smot wallet',
+  'thanks mart wallet',
+  'thanks matts wallet',
+];
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -26,9 +37,23 @@ export async function POST(request: Request) {
 
   console.log('Relevant Crypto Action Items:', relevantActionItems);
 
-  return new Response(JSON.stringify(relevantActionItems), {
+  let streamedResponse = await fetch('/api/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: body.id,
+      messages: body.messages,
+      modelId: body.modelId,
+    }),
+  });
+
+  // Process the streamed response
+  const result = await streamedResponse.json(); // Or use response.text() if expecting plain text
+  console.log(result);
+
+  return new Response(JSON.stringify(streamedResponse), {
     headers: { 'Content-Type': 'application/json' },
   });
-  console.log(body);
-  return new Response('OK');
 }

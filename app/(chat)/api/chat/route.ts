@@ -63,10 +63,11 @@ export async function POST(request: Request) {
   }: { id: string; messages: Array<Message>; modelId: string } =
     await request.json();
 
-  const session = await auth();
+  let session = await auth();
 
   if (!session || !session.user || !session.user.id) {
-    return new Response('Unauthorized', { status: 401 });
+    // return new Response('Unauthorized', { status: 401 });
+    session = { user: { id: 'guest' }, expires: '' }
   }
 
   const model = models.find((model) => model.id === modelId);
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
 
   if (!chat) {
     const title = await generateTitleFromUserMessage({ message: userMessage });
-    await saveChat({ id, userId: session.user.id, title });
+    await saveChat({ id, userId: session?.user?.id ?? '', title });
   }
 
   await saveMessages({
