@@ -1,6 +1,7 @@
 'use client';
 
 import { disconnect } from '@wagmi/core';
+import { ethers, Wallet } from 'ethers';
 import React, {
   useCallback,
   useEffect,
@@ -23,7 +24,6 @@ import {
 } from '@/lib/abi/SpendPermissionManager';
 
 import { useConfig } from '../../app/(chat)/context/ConfigContext';
-import { ethers, Wallet } from 'ethers';
 
 const GRADIENT_BORDER_WIDTH = 2;
 
