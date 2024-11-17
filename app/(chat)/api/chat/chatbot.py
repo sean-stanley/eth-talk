@@ -1,4 +1,5 @@
 import json
+import os
 
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_openai import ChatOpenAI
@@ -16,7 +17,7 @@ from cdp import *
 from os.path import dirname, abspath
 
 # local imports
-from tools import send_to_ens_tool, coin_quote_tool
+from tools import send_to_ens_tool, coin_quote_tool, get_transaction_history_tool, GetTransactionHistoryInput, EnsTransferInput
 
 from flask import Flask
 from flask import request, json
@@ -28,10 +29,10 @@ wallet_data_file = "wallet_data.txt"
 
 dir = dirname(abspath(__file__))
 
-# Rest of the code goes here...
+# Tools for the LLM to pick between
 
 
-def initialize_agent(model: str = "gpt-4o-mini"):
+def initialize_agent(model: str = "gpt-4o"):
     """Initialize the agent with CDP Agentkit."""
     # System prompt
     print("Initializing CDP Agentkit Chatbot...")
@@ -85,7 +86,16 @@ def initialize_agent(model: str = "gpt-4o-mini"):
         func=send_to_ens_tool,
     )
 
-    tools = cdp_tools + [coin_quote_tool, send_to_ens]
+    get_transaction_history = CdpTool(
+        name="get_transaction_history_tool",
+        description=
+        "Get information about all the transfers and trades of a particular address for a specific token.",
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=GetTransactionHistoryInput,
+        func=get_transaction_history_tool,
+    )
+
+    tools = cdp_tools + [coin_quote_tool, send_to_ens, get_transaction_history]
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()
@@ -160,11 +170,10 @@ def spend_control():
     print(data)
     # agent_executor, config = initialize_agent()
     Cdp.configure(os.getenv("CDP_API_KEY_NAME"), os.getenv("CDP_API_KEY_PRIVATE_KEY"))
+    
+    # fetched_wallet = Wallet.load_seed(file_path=wallet_data_file)
 
-    fetched_wallet = Wallet.fetch(wallet.id)
-    fetched_wallet.load_seed(wallet_data_file)
-
-    response = {"message": "spend control engaged! Lets go!"}
+    response = {"message": "spend control engaged! Lets go!" }
     return json.dumps(response)
 
 
