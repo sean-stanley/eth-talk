@@ -104,7 +104,8 @@ export async function POST(request: Request) {
     experimental_activeTools: allTools,
     tools: {
       useWallet: {
-        description: 'Get the current balance of the user',
+        description:
+          'Access the users crypto wallet to check balances and perform transactions',
         parameters: z.object({}),
 
         execute: async ({}) => {
