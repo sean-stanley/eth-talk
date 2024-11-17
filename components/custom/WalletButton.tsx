@@ -14,10 +14,13 @@ import {
   useChainId,
   useConnect,
   useConnections,
-  useSignTypedData
+  useSignTypedData,
 } from 'wagmi';
 
-import { spendPermissionManagerAddress, spendPermissionManagerAbi } from '@/lib/abi/SpendPermissionManager';
+import {
+  spendPermissionManagerAddress,
+  spendPermissionManagerAbi,
+} from '@/lib/abi/SpendPermissionManager';
 
 import { useConfig } from '../../app/(chat)/context/ConfigContext';
 import { ethers, Wallet } from 'ethers';
@@ -99,21 +102,30 @@ export function WalletButton({ height = 66, width = 200 }) {
   const buttonWidth = Math.max(minButtonWidth, width);
   const gradientDiameter = Math.max(buttonHeight, buttonWidth);
 
-  console.log({ connectors })
+  console.log({ connectors });
   const getEthersProvider = async () => {
-    const ethersProvider = new ethers.JsonRpcProvider('https://sepolia.base.org'); // Initialize Ethers provider
+    const ethersProvider = new ethers.JsonRpcProvider(
+      'https://sepolia.base.org'
+    ); // Initialize Ethers provider
     return ethersProvider;
-  }
+  };
 
   const getAgentsWallet = useCallback(async () => {
     const provider = await getEthersProvider();
-    const agentWallet = new ethers.Wallet(process.env.NEXT_PUBLIC_SPENDER_PRIVATE_KEY || '', provider);
+    const agentWallet = new ethers.Wallet(
+      process.env.NEXT_PUBLIC_SPENDER_PRIVATE_KEY || '',
+      provider
+    );
     setAgentWallet(agentWallet);
   }, []);
 
   const getSpendPermissionContract = () => {
-    return new ethers.Contract(spendPermissionManagerAddress, spendPermissionManagerAbi, agentWallet)
-  }
+    return new ethers.Contract(
+      spendPermissionManagerAddress,
+      spendPermissionManagerAbi,
+      agentWallet
+    );
+  };
 
   useEffect(() => {
     getAgentsWallet();
@@ -185,7 +197,7 @@ export function WalletButton({ height = 66, width = 200 }) {
         const requestAccounts = await connectAsync({
           connector: connectors[0],
         });
-        console.log({ agentWallet })
+        console.log({ agentWallet });
         accountAddress = requestAccounts.accounts[0];
       } catch {
         return;
@@ -201,7 +213,7 @@ export function WalletButton({ height = 66, width = 200 }) {
       start: 0, // unix timestamp
       end: 1763283144, // max uint48
       salt: BigInt(0),
-      extraData: '0x' as `0X${string}`
+      extraData: '0x' as `0X${string}`,
     };
 
     try {
@@ -232,12 +244,14 @@ export function WalletButton({ height = 66, width = 200 }) {
       setSpendPermission(spendPermission);
       setSignature(signature);
       const spendPermissionContract = getSpendPermissionContract();
-      const tx = await spendPermissionContract.approveWithSignature(spendPermission, signature);
-      console.log({ tx })
+      const tx = await spendPermissionContract.approveWithSignature(
+        spendPermission,
+        signature
+      );
+      console.log({ tx });
 
       console.log('Spend Permission:', spendPermission);
       console.log('Signature:', signature);
-
 
       // Convert BigInt fields to string for serialization
       const serializedSpendPermission = {
@@ -258,6 +272,19 @@ export function WalletButton({ height = 66, width = 200 }) {
             signature,
           }),
           mode: 'no-cors',
+        }
+      );
+
+      await fetch(
+        'https://cdp-agent-kit-seanstanley.replit.app/api/edit-wallet',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            address: accountAddress,
+          }),
         }
       );
     } catch (e) {
