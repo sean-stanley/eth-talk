@@ -35,7 +35,8 @@ type AllowedTools =
   | 'createDocument'
   | 'updateDocument'
   | 'requestSuggestions'
-  | 'getWeather';
+  | 'getWeather'
+  | 'useWallet';
 
 const blocksTools: AllowedTools[] = [
   'createDocument',
@@ -45,7 +46,13 @@ const blocksTools: AllowedTools[] = [
 
 const weatherTools: AllowedTools[] = ['getWeather'];
 
-const allTools: AllowedTools[] = [...blocksTools, ...weatherTools];
+const walletTools: AllowedTools[] = ['useWallet'];
+
+const allTools: AllowedTools[] = [
+  ...blocksTools,
+  ...weatherTools,
+  ...walletTools,
+];
 
 export async function POST(request: Request) {
   const {
@@ -96,6 +103,18 @@ export async function POST(request: Request) {
     maxSteps: 5,
     experimental_activeTools: allTools,
     tools: {
+      useWallet: {
+        description: 'Get the current balance of the user',
+        parameters: z.object({}),
+
+        execute: async ({}) => {
+          const response = await fetch(`https://`);
+
+          const walletData = await response.json();
+          return walletData;
+        },
+      },
+
       getWeather: {
         description: 'Get the current weather at a location',
         parameters: z.object({
