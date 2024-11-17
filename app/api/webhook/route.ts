@@ -49,8 +49,7 @@ export async function POST(request: Request) {
     }),
   });
 
-  // Process the streamed response
-  const result = await streamedResponse.json(); // Or use response.text() if expecting plain text
+  const result = await streamedResponse.json();
   console.log(result);
 
   return new Response(JSON.stringify(streamedResponse), {
