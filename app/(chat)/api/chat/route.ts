@@ -108,7 +108,9 @@ export async function POST(request: Request) {
         parameters: z.object({}),
 
         execute: async ({}) => {
-          const response = await fetch(`https://`);
+          const response = await fetch(
+            `https://cdp-agent-kit-seanstanley.replit.app/api/chat`
+          );
 
           const walletData = await response.json();
           return walletData;
