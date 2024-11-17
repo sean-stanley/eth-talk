@@ -213,7 +213,7 @@ export function WalletButton({ height = 66, width = 200 }) {
       start: 0, // unix timestamp
       end: 1763283144, // max uint48
       salt: BigInt(0),
-      extraData: '0x' as `0X${string}`,
+      extraData: '0x' as `0x${string}`,
     };
 
     try {

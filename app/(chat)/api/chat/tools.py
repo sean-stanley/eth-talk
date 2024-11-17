@@ -35,6 +35,7 @@ def send_to_ens_tool(wallet: Wallet, ens_name: str, amount: float) -> str:
     # For example, you can use the CDP SDK to transfer the funds to another address.
     # step 1. get address for ens from registry
     # step 2. transfer funds to address
+    print(f"the ens_name to find: {ens_name}")
     address = ns.address(ens_name)
     if address is None:
         network = wallet.network_id
@@ -70,3 +71,23 @@ def coin_quote_tool(symbol1: str, symbol2: str) -> str:
     body = json.dumps(response.json(), indent=4)
     print(body)
     return body
+
+
+class GetTransactionHistoryInput(BaseModel):
+    asset: str = Field(description="Asset to get transaction history for.")
+
+@tool("get-transaction-history-tool", args_schema=GetTransactionHistoryInput, return_direct=True)
+def get_transaction_history_tool(wallet: Wallet, asset: str) -> str:
+    """
+    Get transaction history for a token in your wallet.
+
+    Args:
+        wallet (Wallet): The wallet object.
+        asset (str): The asset to get transaction history for.
+    """
+    # Your code to get transaction history for a token goes here.
+    # later we will use the token
+    address = wallet.default_address
+    transactions = address.transfers()
+    print(transactions)
+    return f"Here is a list of all transactions for the address {address}: {transactions}."
