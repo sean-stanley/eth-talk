@@ -109,7 +109,16 @@ export async function POST(request: Request) {
 
         execute: async ({}) => {
           const response = await fetch(
-            `https://cdp-agent-kit-seanstanley.replit.app/api/chat`
+            `https://cdp-agent-kit-seanstanley.replit.app/api/chat`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                messages: messages,
+              }),
+            }
           );
 
           const walletData = await response.json();
